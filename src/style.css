@@ -1,1 +1,86 @@
-body {padding: 1em; }
+@import url('https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i&display=swap&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese');
+body {
+    padding: 1em;
+    font-family: 'Noto Serif', serif;
+    font-size: 11pt;
+}
+
+h1 {
+    margin-top: 5rem;
+    margin-bottom: 1.5rem;
+}
+
+h1:first-child {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 4rem;
+    margin-bottom: 1rem;
+}
+
+h3, h4 {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table thead tr th {
+    text-align: left;
+    background: #333;
+    color: #fff;
+}
+
+table tbody tr:nth-child(even) {
+    background: #eee;
+}
+
+table th, table td {
+    padding: 0.5rem;
+}
+
+table td {
+    vertical-align: top;
+}
+
+table td ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+dl::after {
+    content: ' ';
+    display: table;
+    clear: both;
+}
+
+dl dt {
+    display: inline-block;
+    float: left;
+    width: 20%;
+    margin: 0;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+}
+
+dl dt::after {
+    content: ":";
+}
+
+dl dd {
+    float: left;
+    display: inline-block;
+    width: 80%;
+    margin: 0;
+    margin-bottom: 0.5rem;
+    font-style: italic;
+}
