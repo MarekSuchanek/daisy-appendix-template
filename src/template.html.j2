@@ -1,7 +1,6 @@
 {%- set c = ctx|to_context_obj -%}
 {%- macro daisy_appendix(project_id) -%}
   {%- set project_rq_uri = "https://daisy-demo.elixir-luxembourg.org/api/projects?API_KEY=" ~ secrets["API_KEY"] ~ "&project_id=" ~ project_id -%}
-  <pre>{{project_rq_uri}}</pre>
   {%- set contracts_rq_uri = "https://daisy-demo.elixir-luxembourg.org/api/contracts?API_KEY=" ~ secrets["API_KEY"] ~ "&project_id=" ~ project_id -%}
   {%- set datasets_rq_uri = "https://daisy-demo.elixir-luxembourg.org/api/datasets?API_KEY=" ~ secrets["API_KEY"] ~ "&project_id=" ~ project_id -%}
   {%- set r1 = requests.get(project_rq_uri) -%}
@@ -168,11 +167,38 @@
 
   <h4>Data Declarations</h4>
 
-  <i>TODO</i>
+  {% if dataset["data_declarations"]|length > 0 %}
+  
+  {% else %}
+  <div>No data declarations defined for this dataset.</div>
+  {% endif %}
 
   <h4>Legal Bases</h4>
-
-  <i>TODO</i>
+  
+  {% if dataset["legal_bases"]|length > 0 %}
+  <table>
+    <thead>
+      <tr>
+        <th>Legal basis codes</th>
+        <th>Personal data codes</th>
+        <th>Data declarations</th>
+        <th>Accesses</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for legal_base in dataset["legal_bases"] %}
+      <tr>
+        <td>{{legal_base["legal_basis_codes"]|join(", ")}}</td>
+        <td>{{legal_base["personal_data_codes"]|join(", ")}}</td>
+        <td>{{legal_base["data_declarations"]|join(", ")}}</td>
+        <td>{{legal_base["legal_basis_notes"]}}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div>No legal bases defined for this dataset.</div>
+  {% endif %}
 
   <h4>Storages</h4>
   
@@ -221,11 +247,12 @@
     </tbody>
   </table>
   {% else %}
-  <div>No storages defined for this dataset.</div>
+  <div>No transfers defined for this dataset.</div>
   {% endif %}
 
   <h4>Contacts</h4>
   
+  {% if dataset["contacts"]|length > 0 %}
   <table>
     <thead>
       <tr>
@@ -246,6 +273,9 @@
       {% endfor %}
     </tbody>
   </table>
+  {% else %}
+  <div>No contacts defined for this dataset.</div>
+  {% endif %}
 
   {%- endfor %}
 
