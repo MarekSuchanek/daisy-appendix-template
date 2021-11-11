@@ -1,0 +1,284 @@
+{%- set c = ctx|to_context_obj -%}
+{%- macro daisy_appendix(project_id) -%}
+  {%- set project_rq_uri = "https://daisy-demo.elixir-luxembourg.org/api/projects?API_KEY=" ~ secrets["API_KEY"] ~ "&project_id=" ~ project_id -%}
+  <pre>{{project_rq_uri}}</pre>
+  {%- set contracts_rq_uri = "https://daisy-demo.elixir-luxembourg.org/api/contracts?API_KEY=" ~ secrets["API_KEY"] ~ "&project_id=" ~ project_id -%}
+  {%- set datasets_rq_uri = "https://daisy-demo.elixir-luxembourg.org/api/datasets?API_KEY=" ~ secrets["API_KEY"] ~ "&project_id=" ~ project_id -%}
+  {%- set r1 = requests.get(project_rq_uri) -%}
+  {%- set r2 = requests.get(contracts_rq_uri) -%}
+  {%- set r3 = requests.get(datasets_rq_uri) -%}
+  {%- set projects = [] %}
+  {%- for p in r1.json().get('items', []) -%}
+    {%- if p['id_at_source'] == project_id -%}
+      {% do projects.append(p) %}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if r1.ok and r2.ok and r3.ok and projects|length == 1 %}
+    {{ _render_daisy_appendix(projects[0], r2.json().get('items', []), r3.json().get('items', [])) }}
+  {%- else %}
+  <div class="daisy-error">Failed to retrieve information from DAISY about the project (status {{r1.status_code}}).</div>
+
+  <ul>
+    <li>Project: {{r1.status_code}}</li>
+    <li>Contracts: {{r2.status_code}}</li>
+    <li>Datasets: {{r3.status_code}}</li>
+  </ul>
+
+  <pre>{{r1.json().get('items', [])|tojson(2)}}</pre>
+  {%- endif %}
+{%- endmacro -%}
+{%- macro _render_daisy_appendix(project, contracts, datasets) %}
+  <h1>{{project["acronym"]}}: {{project["name"]}}</h1>
+
+  <div>Data Protection Appendix</div>
+
+  <h2>Project information</h2>
+
+  <div>{{project["description"]|markdown}}</div>
+
+  <dl>
+    <dt>Start date</dt>
+    <dd>{{project["start_date"]}}</dd>
+    <dt>End date</dt>
+    <dd>{{project["end_date"]}}</dd>
+    <dt>Project source</dt>
+    <dd>{{project["source"]}}</dd>
+    <dt>External ID</dt>
+    <dd>{{project["external_id"]}}</dd>
+  </dl>
+
+  <h2>Institutional and national ethics approval</h2>
+
+  <ul>
+    <li>
+      {{ "✔️ " if project["has_institutional_ethics_approval"] else "❌ " }}
+      <span>institutional ethics approval</span>    
+      {% if project["institutional_ethics_approval_notes"] %}
+        <br />
+        {{project["institutional_ethics_approval_notes"]}}
+      {% endif %}
+      <br />
+    </li>
+    <li>
+      {{ "✔️ " if project["has_national_ethics_approval"] else "❌ " }}
+      <span>national ethics approval</span>
+      {% if project["national_ethics_approval_notes"] %}
+        <br />
+        {{project["national_ethics_approval_notes"]}}
+      {% endif %}
+      <br />
+    </li>
+  </ul>
+
+  <h2>Contacts</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>E-mail</th>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Affiliation(s)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for contact in project["contacts"] %}
+      <tr>
+        <td>{{contact["email"]}}</td>
+        <td>{{contact["first_name"]}} {{contact["last_name"]}}</td>
+        <td>{{contact["role"]}}</td>
+        <td>{{contact["affiliations"]|join(", ")}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Contracts</h2>
+
+  {%- for contract in contracts %}
+  <h3>{{contract["comments"]}}</h3>
+
+  <h4>Local Custodians</h4>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>E-mail</th>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Affiliation(s)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for contact in contract["local_custodians"] %}
+      <tr>
+        <td>{{contact["email"]}}</td>
+        <td>{{contact["first_name"]}} {{contact["last_name"]}}</td>
+        <td>{{contact["role"]}}</td>
+        <td>{{contact["affiliations"]|join(", ")}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h4>Partners</h4>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Partner</th>
+        <th>Roles</th>
+        <th>Comments</th>
+        <th>Contacts</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for partner in contract["partners"] %}
+      <tr>
+        <td>{{partner["partner"]}}</td>
+        <td>
+          <ul>
+            {% for role in partner["roles"] %}
+              <li>{{role.split("_")|join(" ")}}</li>
+            {% endfor %}
+          </ul>
+        </td>
+        <td>{{partner["comments"]}}</td>
+        <td>
+          <ul>
+            {% for contact in partner["contacts"] %}
+              <li>{{contact["first_name"]}} {{contact["last_name"]}} ({{contact["email"]}})</li>
+            {% endfor %}
+          </ul>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {%- endfor %}
+
+  <h2>Datasets</h2>
+
+  {%- for dataset in datasets %}
+  <h3>{{dataset["name"]}}</h3>
+
+  {% if dataset["description"] %}{{dataset["description"]|markdown}}{% endif %}
+
+  <p>Originates from project "{{dataset["project"]}}" ({{project["project_external_id"]}}).</p>
+
+  <h4>Data Declarations</h4>
+
+  <i>TODO</i>
+
+  <h4>Legal Bases</h4>
+
+  <i>TODO</i>
+
+  <h4>Storages</h4>
+  
+  {% if dataset["storages"]|length > 0 %}
+  <table>
+    <thead>
+      <tr>
+        <th>Platform</th>
+        <th>Location</th>
+        <th>Accesses</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for storage in dataset["storages"] %}
+      <tr>
+        <td>{{storage["platform"]}}</td>
+        <td>{{storage["location"]}}</td>
+        <td>{{storage["accesses"]|join(", ")}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div>No storages defined for this dataset.</div>
+  {% endif %}
+
+  <h4>Transfers</h4>
+  
+  {% if dataset["transfers"]|length > 0 %}
+  <table>
+    <thead>
+      <tr>
+        <th>Partner</th>
+        <th>Date</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for transfer in dataset["transfers"] %}
+      <tr>
+        <td>{{transfer["partner"]}}</td>
+        <td>{% if transfer["transfer_date"] %}{{transfer["transfer_date"]}}{% else %}Not specified{% endif %}</td>
+        <td>{% if transfer["transfer_details"] %}{{transfer["transfer_details"]}}{% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div>No storages defined for this dataset.</div>
+  {% endif %}
+
+  <h4>Contacts</h4>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>E-mail</th>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Affiliation(s)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for contact in dataset["contacts"] %}
+      <tr>
+        <td>{{contact["email"]}}</td>
+        <td>{{contact["first_name"]}} {{contact["last_name"]}}</td>
+        <td>{{contact["role"]}}</td>
+        <td>{{contact["affiliations"]|join(", ")}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {%- endfor %}
+
+  <h2>Publications</h2>
+
+  <ul>
+  {%- for publication in project["publications"] %}
+    <li>
+      {{publication["citation"]|markdown}}
+      {% if publication["doi"] %}
+        <br />
+        DOI: <a href="https://doi.org/{{ publication["doi"] }}" target="_blank">{{publication["doi"]}}</a>
+      {% endif %}
+    </li>
+  {%- endfor %}
+  </ul>
+{%- endmacro %}
+{##########################################################################}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+    {% include "src/style.css" %}
+    </style>
+  </head>
+  <body>
+    <h1>Sample document from DSW</h1>
+    <p>There can be some content created based on replies and KM, just as it is done for other document templates. Then, data from DAISY can be used to render the appendix, or something like that... who knows.</p>
+
+    {%- set project_question = c.e.questions['994c8c6e-8029-4215-83bc-a7362ead82ed'] -%}
+    {%- for reply in project_question.replies.values() %}
+      {{ daisy_appendix(reply.id) }}
+    {%- endfor %}
+  </body>
+</html>

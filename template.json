@@ -1,0 +1,44 @@
+{
+    "templateId": "daisy-appendix-template",
+    "organizationId": "dsw",
+    "version": "0.1.0",
+    "name": "DAISY Appendix Template",
+    "description": "DPIA appendix from DAISY project",
+    "license": "CC0",
+    "metamodelVersion": 5,
+    "recommendedPackageId": null,
+    "allowedPackages": [
+        {
+            "orgId": null,
+            "kmId": null,
+            "minVersion": null,
+            "maxVersion": null
+        }
+    ],
+    "formats": [
+        {
+            "uuid": "bdccc229-9467-49c5-8d98-6fa85e05866d",
+            "name": "HTML",
+            "shortName": "html",
+            "icon": "fas fa-file",
+            "color": "#f15722",
+            "steps": [
+                {
+                    "name": "jinja",
+                    "options": {
+                        "template": "src/template.html.j2",
+                        "content-type": "text/html",
+                        "extension": "html"
+                    }
+                }
+            ]
+        }
+    ],
+    "_tdk": {
+        "version": "3.5.0",
+        "readmeFile": "README.md",
+        "files": [
+            "src/**/*"
+        ]
+    }
+}
