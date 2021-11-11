@@ -85,7 +85,7 @@
       <tr>
         <td>{{contact["email"]}}</td>
         <td>{{contact["first_name"]}} {{contact["last_name"]}}</td>
-        <td>{{contact["role"]}}</td>
+        <td>{{contact["role"].split("_")|join(" ")}}</td>
         <td>{{contact["affiliations"]|join(", ")}}</td>
       </tr>
       {% endfor %}
@@ -93,6 +93,10 @@
   </table>
 
   <h2>Contracts</h2>
+
+  {% if contracts|length == 0 %}
+  <p>No contracts defined for this project.</p>
+  {% endif %}
 
   {%- for contract in contracts %}
   <h3>{{contract["comments"]}}</h3>
@@ -113,7 +117,7 @@
       <tr>
         <td>{{contact["email"]}}</td>
         <td>{{contact["first_name"]}} {{contact["last_name"]}}</td>
-        <td>{{contact["role"]}}</td>
+        <td>{{contact["role"].split("_")|join(" ")}}</td>
         <td>{{contact["affiliations"]|join(", ")}}</td>
       </tr>
       {% endfor %}
@@ -158,12 +162,18 @@
 
   <h2>Datasets</h2>
 
+  {% if datasets|length == 0 %}
+  <p>No datasets defined for this project.</p>
+  {% endif %}
+
   {%- for dataset in datasets %}
   <h3>{{dataset["name"]}}</h3>
 
   {% if dataset["description"] %}{{dataset["description"]|markdown}}{% endif %}
 
-  <p>Originates from project "{{dataset["project"]}}" ({{project["project_external_id"]}}).</p>
+  {% if dataset["project"] %}
+  <p>Originates from project "{{dataset["project"]}}" {% if project["project_external_id"] %}({{project["project_external_id"]}}){% endif %}.</p>
+  {% endif %}
 
   <h4>Data Declarations</h4>
 
@@ -267,7 +277,7 @@
       <tr>
         <td>{{contact["email"]}}</td>
         <td>{{contact["first_name"]}} {{contact["last_name"]}}</td>
-        <td>{{contact["role"]}}</td>
+        <td>{{contact["role"].split("_")|join(" ")}}</td>
         <td>{{contact["affiliations"]|join(", ")}}</td>
       </tr>
       {% endfor %}
@@ -305,8 +315,8 @@
   <body>
     <h1>Sample document from DSW</h1>
     <p>There can be some content created based on replies and KM, just as it is done for other document templates. Then, data from DAISY can be used to render the appendix, or something like that... who knows.</p>
-
-    {%- set project_question = c.e.questions['994c8c6e-8029-4215-83bc-a7362ead82ed'] -%}
+    {%- set question_uuid = 'de8c9bca-65a9-4a16-a172-3af5d6e0880a' %}
+    {%- set project_question = c.e.questions[question_uuid] -%}
     {%- for reply in project_question.replies.values() %}
       {{ daisy_appendix(reply.id) }}
     {%- endfor %}

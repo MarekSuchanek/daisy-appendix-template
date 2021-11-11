@@ -1,16 +1,16 @@
 {
-    "templateId": "daisy-appendix-template-styles",
+    "templateId": "daisy-appendix-template",
     "organizationId": "dsw",
-    "version": "0.1.0",
-    "name": "DAISY Appendix Template Styles",
+    "version": "0.2.0",
+    "name": "DAISY Appendix Template",
     "description": "Just a temporary template",
     "license": "CC0",
     "metamodelVersion": 5,
     "recommendedPackageId": null,
     "allowedPackages": [
         {
-            "orgId": null,
-            "kmId": null,
+            "orgId": "dsw.biohackathon",
+            "kmId": "daisy-integration-demo",
             "minVersion": null,
             "maxVersion": null
         }
