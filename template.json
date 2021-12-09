@@ -1,11 +1,11 @@
 {
     "templateId": "daisy-appendix-template",
     "organizationId": "dsw",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "name": "DAISY Appendix Template",
     "description": "Just a temporary template",
-    "license": "CC0",
-    "metamodelVersion": 5,
+    "license": "Apache-2.0",
+    "metamodelVersion": 6,
     "recommendedPackageId": null,
     "allowedPackages": [
         {
